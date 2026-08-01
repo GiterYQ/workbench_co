@@ -8,7 +8,7 @@
 
 这个项目提供的是一套**可改造的基础骨架**，不是已经替你定义好岗位、行业、字段和流程的现成系统。不同职业需要管理的对象不同：内容运营关注作品和选题，项目经理关注项目和交付，销售关注客户和商机，研究人员关注资料和结论。工作台的模块、字段、分类、状态、视图和自动化，都应该围绕你的实际工作重新配置。
 
-你可以把仓库交给 WorkBuddy（例如 [CodeBuddy Work](https://www.codebuddy.cn/work/)），让它先理解你的职业和工作方式，再修改工作台。第一次使用建议按这个顺序：
+你可以把仓库交给 WorkBuddy（[下载/进入 WorkBuddy](https://www.codebuddy.cn/events/invite?inviteCode=t01jaexsv7t8czda)），让它先理解你的职业和工作方式，再修改工作台。第一次使用建议按这个顺序：
 
 1. 说明你的职业、服务对象、日常工作、固定产出和常用工具；
 2. 让 WorkBuddy 先检查现有页面、接口和空数据结构，提出需要保留、删除和新增的模块；
@@ -40,7 +40,7 @@ npm run check
 
 ## 用 CodeBuddy 操作
 
-可以在 [CodeBuddy Work](https://www.codebuddy.cn/work/) 中打开或导入本仓库，让 AI 按工作台的字段和接口协助维护。建议第一次使用时先发送：
+可以在 [WorkBuddy 下载/进入页](https://www.codebuddy.cn/events/invite?inviteCode=t01jaexsv7t8czda) 中打开或导入本仓库，让 AI 按工作台的字段和接口协助维护。建议第一次使用时先发送：
 
 > 请先阅读 README.md、docs/完整使用指南.md、.env.example 和 data/ 目录，不要创建模拟业务数据；先告诉我每个模块需要哪些真实字段，再按我的确认执行导入或修改。
 
