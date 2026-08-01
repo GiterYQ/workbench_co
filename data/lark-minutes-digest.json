@@ -1,0 +1,31 @@
+{
+  "generatedAt": "",
+  "mode": "empty",
+  "source": "",
+  "status": {
+    "label": "未生成",
+    "tone": "empty",
+    "message": "当前没有本地会议草稿。"
+  },
+  "period": {
+    "today": "",
+    "range": "",
+    "timezone": "Asia/Shanghai"
+  },
+  "meetings": [],
+  "summary": [],
+  "todos": [],
+  "sopCandidates": [],
+  "risks": [],
+  "nextActions": [],
+  "aggregates": {
+    "totalMeetings": 0,
+    "todayCount": 0,
+    "weekCount": 0,
+    "pendingTodos": 0,
+    "sopCandidates": 0,
+    "highRisks": 0,
+    "mediumRisks": 0,
+    "lowRisks": 0
+  }
+}

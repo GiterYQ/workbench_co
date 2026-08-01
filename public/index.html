@@ -1,0 +1,1035 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>内容运营工作台</title>
+  <link rel="stylesheet" href="./styles.css">
+<style>
+.task-top-row { display:flex; gap:8px; align-items:center; margin-bottom:8px }
+.task-top-row input { border:1px solid var(--line); border-radius:12px; padding:9px 12px; background:var(--white); font-size:14px }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="主导航">
+      <div class="brand">
+        <div class="brand-mark">屿</div>
+        <div>
+          <strong>内容运营工作台</strong>
+          <span>开源示例</span>
+        </div>
+      </div>
+
+      <nav class="nav" id="nav">
+        <div class="nav-section-label">项目管理</div>
+        <button class="nav-item active" data-view="dashboard" aria-label="打开任务计划">
+          <span class="icon">☑</span><span>任务计划</span><em id="taskNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="investor" aria-label="打开资方管理">
+          <span class="icon">◎</span><span>资方管理</span><em id="investorNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="referral" aria-label="打开人脉推荐">
+          <span class="icon">👥</span><span>人脉推荐</span><em id="referralNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="follow" aria-label="打开客户跟进生成">
+          <span class="icon">✎</span><span>客户跟进</span><em id="followNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="meeting-notes" aria-label="打开会议纪要">
+          <span class="icon">📝</span><span>会议纪要</span><em id="meetingNotesNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="lark-minutes" aria-label="打开飞书妙记">
+          <span class="icon">◷</span><span>飞书妙记</span><em id="minutesNavCount">0</em>
+        </button>
+        <div class="nav-section-label">工具</div>
+        <button class="nav-item" data-view="experience" aria-label="打开经验复盘">
+          <span class="icon">▣</span><span>经验复盘</span><em id="experienceCount">0</em>
+        </button>
+        <button class="nav-item" data-view="skills" aria-label="打开技能树">
+          <span class="icon">⚡</span><span>Skills 管理</span><em id="skillsNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="feishu-docs" aria-label="打开飞书文档">
+          <span class="icon">📄</span><span>飞书文档</span><em id="feishuDocsNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="settings" aria-label="打开后台设置">
+          <span class="icon">⚙</span><span>后台设置</span><em id="settingsNavCount">0</em>
+        </button>
+        <div class="nav-section-label">运营</div>
+        <button class="nav-item" data-view="growth" aria-label="打开增长日报">
+          <span class="icon">↗</span><span>增长日报</span><em id="growthNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="hot" aria-label="打开爆款选题实验室">
+          <span class="icon">◈</span><span>爆款选题Lab</span><em id="hotNavCount">0</em>
+        </button>
+        <button class="nav-item" data-view="library" aria-label="打开作品库管理">
+          <span class="icon">▤</span><span>作品库管理</span><em id="workCount">0</em>
+        </button>
+        <button class="nav-item" data-view="metrics" aria-label="打开业务数据">
+          <span class="icon">📊</span><span>业务数据</span><em id="metricsNavCount">0</em>
+        </button>
+      </nav>
+
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" type="button" aria-label="折叠侧边栏" title="折叠侧边栏">◀</button>
+      <div class="sync-card" id="syncCard">
+        <span>本地优先</span>
+        <strong>飞书 + Obsidian + Skills</strong>
+        <small id="syncTime">读取中...</small>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Company OS Console</p>
+          <h1 id="pageTitle"><span id="pageTitleText">任务计划</span><span class="page-subtitle" id="pageSubtitle"></span><input id="ideaSearch" type="search" placeholder="搜索标题 / 人群 / 痛点 / 产品" style="display:none;margin-left:14px;width:240px;border:1px solid var(--line);border-radius:10px;padding:5px 10px;font-size:13px;font-weight:400;vertical-align:middle"><input id="investorTopSearch" type="search" placeholder="搜索名称/对接人/备注…" style="display:none;margin-left:14px;width:220px;border:1px solid var(--line);border-radius:10px;padding:5px 10px;font-size:13px;font-weight:400;vertical-align:middle"></h1>
+        </div>
+        <div class="top-actions">
+          <button class="ghost-link" id="addTaskBtn" type="button">+ 新建任务</button>
+          <button class="ghost-link" id="addInvestorTopBtn" type="button" style="display:none">+ 新增资方</button>
+          <button class="ghost-link" id="addMeetingNoteTopBtn" type="button" style="display:none">+ 新增纪要</button>
+          <button class="ghost-link" id="addMetricTopBtn" type="button" style="display:none">+ 新增数据</button>
+          <button class="ghost-link" id="syncAllTasksBtn" type="button">全部同步</button>
+          <button class="ghost-link" id="refreshWorksBtn" type="button" aria-label="刷新作品库" style="display:none">刷新作品库</button>
+          <button class="ghost-link" id="copyIdeaBtn" type="button" aria-label="复制选题简报" style="display:none">复制选题简报</button>
+        </div>
+      </header>
+
+      <section class="workspace active" id="view-dashboard">
+        <div class="task-planner-shell">
+          <div class="task-top-row">
+            <input id="taskSearch" type="search" placeholder="搜索标题 / 下一步 / 归属" style="flex:1;min-width:0">
+          </div>
+          <div class="task-tabs-row">
+            <div class="task-domain-tabs" aria-label="任务域">
+              <button class="task-domain-tab active" data-task-domain="all" type="button">总览</button>
+              <button class="task-domain-tab" data-task-domain="today" type="button">今日</button>
+              <button class="task-domain-tab" data-task-domain="feishu" type="button">飞书待同步</button>
+              <button class="task-domain-tab" data-task-domain="content" type="button">内容/发布会</button>
+              <button class="task-domain-tab" data-task-domain="review" type="button">复盘证据</button>
+              <button class="task-domain-tab" data-task-domain="risk" type="button">风险看板</button>
+            </div>
+            <div class="task-plan-tabs" aria-label="任务计划视图">
+              <button class="task-plan-tab active" data-task-mode="tasks" type="button">按状态</button>
+              <button class="task-plan-tab" data-task-mode="collections" type="button">按合集</button>
+            </div>
+          </div>
+
+
+          <div class="task-mid-row" id="taskMidRow">
+            <div class="task-filters-col">
+              <div class="task-filter-line">
+            <span>状态</span>
+            <div class="task-filter-strip" id="taskStatusFilters"></div>
+          </div>
+
+          <div class="task-filter-line">
+            <span>合集</span>
+            <div class="task-filter-strip subtle" id="taskCollectionFilters"></div>
+          </div>
+
+
+          <div class="task-filter-line">
+            <span>优先级</span>
+            <div class="task-filter-strip subtle" id="taskPriorityFilters"></div>
+          </div>
+
+          <div class="task-controls-row">
+            <div class="task-controls-group">
+              <span>排序</span>
+              <div class="task-filter-strip" id="taskSortButtons"></div>
+            </div>
+            <div class="task-controls-group">
+              <span>视图</span>
+              <div class="task-filter-strip" id="taskViewButtons"></div>
+            </div>
+          </div>
+
+          <div class="task-result-summary" id="taskResultSummary"></div>
+          <div class="task-metrics" id="taskMetrics"></div>
+            </div>
+            <aside class="task-detail-slot" id="taskDetailSlot"></aside>
+          </div>
+          <div class="task-board" id="taskBoard"></div>
+        </div>
+      </section>
+
+      <section class="workspace" id="view-growth">
+        <div class="section-head">
+          <div>
+            <span class="label">Growth Daily</span>
+            <h2 id="growthTitle">增长日报</h2>
+          </div>
+          <button class="primary" id="copyGrowthBtn" aria-label="复制增长日报">复制日报</button>
+        </div>
+        <p class="data-warning">当前没有预置增长数据；录入后可按平台查看真实记录和后续动作。</p>
+        <div class="growth-layout">
+          <article class="big-number">
+            <span>全平台总粉丝</span>
+            <strong id="totalFollowers">--</strong>
+            <small id="growthDelta">--</small>
+            <div class="sparkline" aria-hidden="true"><i></i></div>
+          </article>
+          <article class="goal-card">
+            <span>里程碑预测</span>
+            <strong id="goalDate">--</strong>
+            <small id="goalText">目标粉丝 --</small>
+            <div class="progress"><i id="goalProgress"></i></div>
+          </article>
+        </div>
+        <div class="platform-grid" id="platformGrid"></div>
+        <div class="two-col">
+          <form class="panel form-panel" id="growthForm">
+            <div class="section-head compact">
+              <h3>手动录入今日数据</h3>
+            </div>
+            <label>
+              平台
+              <select name="platform">
+                <option>小红书</option>
+                <option>视频号</option>
+                <option>公众号</option>
+                <option>B站</option>
+                <option>其他平台</option>
+              </select>
+            </label>
+            <label>
+              当前粉丝
+              <input name="followers" type="number" min="0" placeholder="例如 645400">
+            </label>
+            <label>
+              今日新增
+              <input name="dailyIncrease" type="number" placeholder="例如 183">
+            </label>
+            <label>
+              互动量
+              <input name="interactions" type="number" placeholder="点赞+收藏+评论+分享">
+            </label>
+            <label>
+              线索数
+              <input name="leads" type="number" placeholder="私信/报名/B端咨询">
+            </label>
+            <label>
+              备注
+              <textarea name="note" placeholder="例如：城市活动招募内容带来3条私信"></textarea>
+            </label>
+            <button class="primary" type="submit">保存到本地日报</button>
+          </form>
+          <section class="panel">
+            <div class="section-head compact">
+              <h3>粘贴解析</h3>
+            </div>
+            <textarea id="growthPaste" placeholder="可粘贴：小红书 645400 日+183 互动 203 线索 5"></textarea>
+            <div class="button-row">
+              <button class="small-btn" id="parseGrowthBtn" type="button">解析到表单</button>
+              <button class="small-btn secondary" id="clearGrowthBtn" type="button">清空</button>
+            </div>
+            <ul class="insight-list">
+              <li>粉丝只是结果指标，必须补互动、私信、报名和B端咨询。</li>
+              <li>增长日报先本地跑通，再接飞书或平台后台。</li>
+              <li>保存记录会写入本地 `workbench/data/growth-entries.json`。</li>
+            </ul>
+          </section>
+        </div>
+        <div class="two-col">
+          <section class="panel">
+            <div class="section-head compact">
+              <h3>本地历史记录</h3>
+              <button class="small-btn" id="refreshGrowthHistoryBtn" type="button">刷新</button>
+            </div>
+            <div class="record-list" id="growthHistory"></div>
+          </section>
+          <section class="panel">
+            <div class="section-head compact">
+              <h3>采集工作流队列</h3>
+            </div>
+            <div class="workflow-list" id="workflowQueue"></div>
+          </section>
+        </div>
+        <section class="panel">
+          <div class="section-head compact">
+            <div>
+              <h3>真实平台采集工具</h3>
+              <p class="section-note">使用 Playwright 打开小红书页面，手动登录后采集公开笔记卡片，再生成本地增长汇总。</p>
+            </div>
+            <div class="button-row tight">
+              <button class="small-btn" id="refreshCrawlBtn" type="button">刷新汇总</button>
+              <button class="small-btn secondary" id="runSummaryBtn" type="button">生成汇总</button>
+            </div>
+          </div>
+          <div class="command-box">
+            <code>公开版默认关闭外部采集；如需连接平台，请在私有环境中配置并人工确认</code>
+          </div>
+          <div class="crawl-summary" id="crawlSummary"></div>
+        </section>
+        <div class="panel">
+          <div class="section-head compact">
+            <h3>增长判断</h3>
+          </div>
+          <ul class="insight-list" id="growthInsights"></ul>
+        </div>
+      </section>
+
+      <section class="workspace" id="view-hot">
+        <div class="asset-tabs" id="assetTabs">
+          <button class="asset-tab active" data-asset-tab="ideas">选题工作台</button>
+          <button class="asset-tab" data-asset-tab="account">本账号高互动</button>
+          <button class="asset-tab" data-asset-tab="library">图书馆</button>
+          <button class="asset-tab" data-asset-tab="dashboard">数据看板</button>
+          <button class="asset-tab" data-asset-tab="competitor">对标账号</button>
+        </div>
+        <div class="lab-mid-row" id="labMidRow">
+          <div class="lab-toolbar">
+            <div class="lab-filter-block">
+              <div class="lab-filter-label">
+                <span>领域</span>
+                <button class="icon-btn" data-manage-taxonomy="categories" type="button" aria-label="管理领域">+</button>
+              </div>
+              <div class="chips compact-chips" id="categoryChips"></div>
+            </div>
+            <div class="lab-filter-block">
+              <div class="lab-filter-label">
+                <span>话题</span>
+                <button class="icon-btn" data-manage-taxonomy="topics" type="button" aria-label="管理话题">+</button>
+              </div>
+              <div class="chips compact-chips muted" id="topicChips"></div>
+            </div>
+            <div class="lab-filter-block">
+              <div class="lab-filter-label">
+                <span>受众</span>
+                <button class="icon-btn" data-manage-taxonomy="audiences" type="button" aria-label="管理受众">+</button>
+              </div>
+              <div class="chips compact-chips audience-chips" id="audienceChips"></div>
+            </div>
+            <div class="lab-filter-block">
+              <div class="lab-filter-label">
+                <span>模型</span>
+                <button class="icon-btn" data-manage-taxonomy="models" type="button" aria-label="管理模型">+</button>
+              </div>
+              <div class="chips compact-chips model-chips" id="modelTypeChips"></div>
+            </div>
+          </div>
+          <aside class="lab-column-detail" id="labColumnDetail"></aside>
+        </div>
+        <div class="content-lab-layout">
+          <div>
+            <div class="library-list-head lab-list-head">
+              <span id="labResultTitle">选题池</span>
+              <span id="labResultMeta">点击卡片查看拆解。</span>
+            </div>
+            <div class="idea-grid" id="ideaGrid"></div>
+          </div>
+          <aside class="panel sticky-detail">
+            <div class="section-head compact">
+              <h3 id="labDetailTitle">选题拆解</h3>
+            </div>
+            <div id="ideaDetail" class="idea-detail">点击左侧选题查看痛点、结构、情绪钩子和标题变体。</div>
+          </aside>
+        </div>
+        <section class="panel">
+          <div class="section-head compact">
+            <h3 id="assetSectionTitle">本地资产库概览</h3>
+            <button class="small-btn" id="refreshAssetsBtn" type="button">刷新</button>
+          </div>
+          <div class="asset-list" id="assetList"></div>
+        </section>
+      </section>
+
+      <section class="workspace" id="view-library">
+        <div class="library-console">
+          <section class="panel library-list-panel">
+            <div class="library-toolbar">
+              <label class="library-search compact-search">
+                <span>搜索标题 / 正文 / 评论 / 话题</span>
+                <input id="workSearch" type="search" placeholder="例如：标题、用户、场景、目标">
+              </label>
+              <div class="library-filter-board">
+                <div class="library-filter-line">
+                  <span>视图</span>
+                  <div class="library-filter-strip" id="workViewTabs"></div>
+                </div>
+                <div class="library-filter-line">
+                  <span>形式</span>
+                  <div class="library-filter-strip" id="workFormatFilters"></div>
+                </div>
+                <div class="library-filter-line">
+                  <span>分类</span>
+                  <div class="library-filter-strip" id="workCategoryFilters"></div>
+                </div>
+                <div class="library-filter-line">
+                  <span>互动</span>
+                  <div class="library-filter-strip" id="workEngagementFilters"></div>
+                </div>
+                <div class="library-filter-line">
+                  <span>呈现</span>
+                  <div class="library-filter-strip" id="workLayoutFilters"></div>
+                </div>
+              </div>
+              <div class="library-result-row">
+                <strong id="workResultCount">0条作品</strong>
+                <div class="library-controls">
+                  <label class="library-sort-control">
+                    排序
+                    <select id="workSortFilter">
+                      <option value="interactions_desc">总互动高到低</option>
+                      <option value="liked_desc">点赞高到低</option>
+                      <option value="collected_desc">收藏高到低</option>
+                      <option value="comments_desc">评论高到低</option>
+                      <option value="shared_desc">分享高到低</option>
+                      <option value="duration_desc">时长长到短</option>
+                      <option value="date_desc">发布时间新到旧</option>
+                      <option value="date_asc">发布时间旧到新</option>
+                      <option value="order_asc">主页顺序</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <label class="visually-hidden">
+                分类备用
+                <select id="workCategoryFilter">
+                  <option>全部</option>
+                </select>
+              </label>
+              <label class="visually-hidden">
+                详情状态备用
+                <select id="workStatusFilter">
+                  <option value="全部">全部</option>
+                  <option value="待补详情">待补详情</option>
+                  <option value="已补详情">已补详情</option>
+                  <option value="手动补详情">手动补详情</option>
+                  <option value="已有正文">已有正文</option>
+                  <option value="仅基础可见">仅基础可见</option>
+                  <option value="需登录/平台提示">需登录/平台提示</option>
+                  <option value="采集失败">采集失败</option>
+                </select>
+              </label>
+            </div>
+            <div id="workList" class="work-list"></div>
+          </section>
+          <aside class="panel work-detail-panel" id="workDetailPanel">
+            <div class="section-head compact">
+              <h3>作品详情</h3>
+              <div class="button-row tight">
+                <a class="small-btn secondary" id="openWorkLink" href="#" target="_blank" rel="noreferrer">打开原文</a>
+                <button class="work-detail-close" id="closeWorkDetail" type="button" aria-label="收起作品详情">×</button>
+              </div>
+            </div>
+            <div id="workDetail" class="work-detail">点击左侧作品查看正文、发布时间、数据口径和分析提示。</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="workspace" id="view-metrics">
+        <div class="section-head">
+          <div class="view-toggle-group" style="display:flex;gap:4px;margin-left:auto">
+            <button class="small-btn secondary active" data-metric-view="cards" type="button">▦ 卡片</button>
+            <button class="small-btn secondary" data-metric-view="list" type="button">☰ 列表</button>
+          </div>
+        </div>
+        <div class="follow-filter-row" style="flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted);margin-right:4px">分类</span>
+          <div class="task-filter-strip" id="metricCategoryFilters"></div>
+        </div>
+        <div class="follow-list" id="metricList"></div>
+      </section>
+
+      <section class="workspace" id="view-follow">
+        <div class="section-head">
+          <div>
+            <span class="label">CRM Draft</span>
+            <h2>客户跟进</h2>
+          </div>
+          <div class="button-row tight">
+            <button class="small-btn secondary" id="syncFollowBtn" type="button">同步到飞书</button>
+            <button class="primary" id="addFollowBtn" type="button">+ 新建跟进</button>
+          </div>
+        </div>
+        <div class="follow-filter-row">
+          <input id="followSearch" type="search" placeholder="搜索客户问题 / 话术">
+          <div class="task-filter-strip" id="followTypeFilters"></div>
+        </div>
+        <div class="follow-list" id="followList"></div>
+      </section>
+
+      <section class="workspace" id="view-skills">
+        <div class="section-head">
+          <div>
+            <span class="label">Reusable Workflow</span>
+            <h2>Skills 管理</h2>
+          </div>
+        </div>
+        <div class="panel skill-rule">
+          <h3>Skill 的判断标准</h3>
+          <p>只有可以重复使用、可以输入、可以产出、可以检查结果的能力，才进入 Skills。一次性任务留在飞书，个人感悟留在 Obsidian。</p>
+        </div>
+        <div class="skill-map" id="skillMap"></div>
+      </section>
+
+      <section class="workspace" id="view-experience">
+        <div class="experience-shell">
+          <div class="experience-tabs" aria-label="经验复盘视图">
+            <button class="experience-tab active" data-exp-library="library" type="button">9.1 经验库 <em id="expLibraryCount">0</em></button>
+            <button class="experience-tab" data-exp-library="content" type="button">9.2 内容复盘 <em id="expContentCount">0</em></button>
+          </div>
+
+          <div class="experience-toolbar">
+            <label class="experience-search">
+              <span>⌕</span>
+              <input id="experienceSearch" type="search" placeholder="搜索经验内容 / 关联 CASE / 分类...">
+            </label>
+            <button class="primary experience-add" id="addExperienceBtn" type="button">+ 新增经验</button>
+          </div>
+
+          <div class="experience-filter-board">
+            <div class="experience-filter-line">
+              <span>类型</span>
+              <div class="experience-filter-strip" id="expTypeFilters"></div>
+            </div>
+            <div class="experience-filter-line">
+              <span>经验分类</span>
+              <div class="experience-filter-strip" id="expCategoryFilters"></div>
+            </div>
+            <div class="experience-filter-line">
+              <span>话题簇</span>
+              <div class="experience-filter-strip" id="expTopicFilters"></div>
+            </div>
+            <div class="experience-filter-line">
+              <span>经验级别</span>
+              <div class="experience-filter-strip" id="expLevelFilters"></div>
+            </div>
+            <div class="experience-filter-line">
+              <span>能力分类</span>
+              <div class="experience-filter-strip" id="expCapFilters"></div>
+            </div>
+            <div id="expCapTooltip" style="margin-top:4px;padding:6px 10px;border-radius:8px;background:#f0f5ee;color:#4a5e3a;font-size:12px;line-height:1.5"></div>
+          </div>
+
+          <div class="experience-result-row">
+            <strong id="experienceResultCount">共筛出 0 条</strong>
+            <div class="experience-controls">
+              <select id="experienceSort" aria-label="经验排序">
+                <option value="default">默认排序</option>
+                <option value="date_desc">时间新到旧</option>
+                <option value="level_core">核心原则优先</option>
+                <option value="type_pos">加分优先</option>
+                <option value="type_neg">减分优先</option>
+              </select>
+              <button class="experience-view active" data-exp-view="cards" type="button">卡片</button>
+              <button class="experience-view" data-exp-view="table" type="button">表格</button>
+              <button class="experience-view" data-exp-pending="true" type="button">待完善 <em id="expPendingCount">0</em></button>
+            </div>
+          </div>
+
+          <div class="experience-layout"><div class="experience-grid" id="experienceGrid"></div><aside class="panel sticky-detail" id="experienceDetail"><p class="empty-text">点击经验卡片查看详情</p></aside></div>
+        </div>
+      </section>
+
+      <section class="workspace" id="view-lark-minutes">
+        <div class="minutes-shell">
+          <div class="minutes-head">
+            <div>
+              <span class="label">Feishu Minutes Digest</span>
+              <h2>飞书妙记草稿台</h2>
+            </div>
+            <div class="button-row tight">
+              <button class="small-btn secondary" id="refreshMinutesBtn" type="button">刷新</button>
+              <button class="primary" id="generateMinutesMockBtn" type="button">生成示例草稿</button>
+            </div>
+          </div>
+
+          <div class="minutes-status-row">
+            <div class="minutes-status-card">
+              <span>当前状态</span>
+              <strong id="minutesStatusLabel">读取中</strong>
+              <small id="minutesStatusMessage">正在读取本地草稿。</small>
+            </div>
+            <div class="minutes-status-card">
+              <span>周期</span>
+              <strong id="minutesPeriod">--</strong>
+              <small id="minutesGeneratedAt">--</small>
+            </div>
+          </div>
+
+          <div class="minutes-metrics" id="minutesMetrics"></div>
+
+          <div class="minutes-layout">
+            <section class="panel minutes-main-panel">
+              <div class="section-head compact">
+                <h3>周报草稿</h3>
+                <button class="small-btn secondary" id="copyMinutesDigestBtn" type="button">复制周报</button>
+              </div>
+              <div class="minutes-summary" id="minutesSummary"></div>
+              <div class="section-head compact side-heading">
+                <h3>来源会议</h3>
+              </div>
+              <div class="minutes-meetings" id="minutesMeetings"></div>
+            </section>
+
+            <aside class="minutes-side">
+              <section class="panel">
+                <div class="section-head compact">
+                  <h3>待办草稿</h3>
+                  <span class="status">人工确认后转任务</span>
+                </div>
+                <div class="minutes-list" id="minutesTodos"></div>
+              </section>
+              <section class="panel">
+                <div class="section-head compact">
+                  <h3>SOP 候选</h3>
+                </div>
+                <div class="minutes-list" id="minutesSops"></div>
+              </section>
+              <section class="panel">
+                <div class="section-head compact">
+                  <h3>风险信号</h3>
+                </div>
+                <div class="minutes-list" id="minutesRisks"></div>
+              </section>
+            </aside>
+          </div>
+
+
+        </div>
+      </section>
+
+
+      <section class="workspace" id="view-referral">
+        <div class="section-head">
+          <div>
+            <span class="label">Referral Network</span>
+            <h2>人脉推荐</h2>
+          </div>
+          <button class="primary" id="addReferralBtn" type="button">+ 新增人脉</button>
+        </div>
+        <div class="follow-filter-row">
+          <input id="referralSearch" type="search" placeholder="搜索人脉/单位/推荐资方">
+          <div class="task-filter-strip" id="referralOrgFilters"></div>
+        </div>
+        <div class="follow-list" id="referralList"></div>
+      </section>
+
+      <section class="workspace" id="view-meeting-notes">
+        <div class="section-head">
+          <div class="view-toggle-group" style="display:flex;gap:4px;margin-left:auto">
+            <button class="small-btn secondary active" data-mn-view="cards" type="button">▦ 卡片</button>
+            <button class="small-btn secondary" data-mn-view="list" type="button">☰ 列表</button>
+          </div>
+        </div>
+        <div class="follow-filter-row" style="flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted);margin-right:4px">类型</span>
+          <div class="task-filter-strip" id="mnTypeFilters"></div>
+        </div>
+        <div class="follow-list" id="meetingNoteList"></div>
+      </section>
+
+      <section class="workspace" id="view-investor">
+        <div class="section-head">
+          <div class="view-toggle-group" style="display:flex;gap:4px;margin-left:auto">
+            <button class="small-btn secondary active" data-inv-view="cards" type="button">▦ 卡片</button>
+            <button class="small-btn secondary" data-inv-view="list" type="button">☰ 列表</button>
+          </div>
+        </div>
+        <div class="follow-filter-row" style="flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted);margin-right:4px">分类</span>
+          <div class="task-filter-strip" id="investorTypeFilters"></div>
+        </div>
+        <div class="follow-filter-row" style="flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted);margin-right:4px">路演</span>
+          <div class="task-filter-strip" id="investorRoadshowFilters"></div>
+        </div>
+        <div class="follow-filter-row" style="flex-wrap:wrap;gap:8px;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--muted);margin-right:4px">谈判</span>
+          <div class="task-filter-strip" id="investorCoopFilters"></div>
+        </div>
+        <div style="margin-bottom:8px">
+          <button class="small-btn secondary" id="toggleArchivedBtn" type="button">📁 已归档资方</button>
+        </div>
+        <div class="follow-list" id="investorList"></div>
+        <div class="section-head" style="margin-top:24px">
+          <div>
+            <span class="label">Schedule</span>
+            <h3>日程管理</h3>
+          </div>
+          <button class="primary" id="addScheduleBtn" type="button">+ 新增日程</button>
+        </div>
+        <div class="follow-list" id="scheduleList"></div>
+      </section>
+
+      <section class="workspace" id="view-feishu-docs">
+        <div class="section-head">
+          <div>
+            <span class="label">Feishu Cloud Docs</span>
+            <h2>飞书文档</h2>
+          </div>
+          <button class="primary" id="addFeishuDocBtn" type="button">+ 新增文档</button>
+        </div>
+        <div class="follow-filter-row">
+          <input id="feishuDocSearch" type="search" placeholder="搜索文档标题/分类">
+          <div class="task-filter-strip" id="feishuDocCategoryFilters"></div>
+        </div>
+        <div class="follow-list" id="feishuDocList"></div>
+      </section>
+
+      <section class="workspace" id="view-settings">
+        <div class="section-head">
+          <div>
+            <span class="label">Backend & Boundary</span>
+            <h2>后台设置</h2>
+          </div>
+        </div>
+        <section class="panel" style="margin-bottom:14px">
+          <div class="section-head compact"><h3>显示</h3></div>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
+            <input type="checkbox" id="darkModeToggle" style="width:auto"> 暗色模式
+          </label>
+        </section>
+        <div class="settings-grid">
+          <section class="panel">
+            <div class="section-head compact">
+              <h3>系统边界</h3>
+            </div>
+            <div class="status-list" id="systemStatus"></div>
+          </section>
+          <section class="panel">
+            <div class="section-head compact">
+              <h3>数据源</h3>
+            </div>
+            <div class="source-list" id="sourceCards"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-layer" id="followModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <h2>新建客户跟进</h2>
+        <button class="icon-btn close-btn" data-close-follow type="button">×</button>
+      </div>
+      <form class="taxonomy-form" id="followForm" style="grid-template-columns:1fr;gap:10px">
+        <div class="form-row">
+          <label>客户类型<select name="customerType" id="customerType"><option>普通客户咨询</option><option>课程咨询</option><option>企业客户合作</option><option>伙伴合作</option></select></label>
+          <label>来源平台<select name="source"><option>小红书</option><option>视频号</option><option>公众号</option><option>官网</option><option>其他来源</option></select></label>
+        </div>
+        <div class="form-row">
+          <label>跟进阶段<select name="stage"><option>初次沟通</option><option>已发资料</option><option>待回复</option><option>需求访谈</option><option>已成交</option><option>暂缓</option></select></label>
+        </div>
+        <label>客户问题<textarea name="question" rows="3" placeholder="想问活动怎么报名、是否适合一个人来、酒店合作怎么做..."></textarea></label>
+        <button class="primary" type="submit">生成跟进草稿</button>
+        <div id="followResult" style="margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:#f8faf4;display:none"></div>
+        <button class="primary" id="saveFollowBtn" type="button" style="display:none">保存草稿</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="taskEditModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="taskEditModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label" id="taskEditModalKicker">任务计划</span>
+          <h2 id="taskEditModalTitle">编辑任务</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-task-edit type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="taskEditForm" style="grid-template-columns:1fr;gap:10px">
+        <input type="hidden" name="id">
+        <label>标题<input name="title" type="text"></label>
+        <div class="form-row">
+          <label>合集<select name="collection"><option>发布会筹备</option><option>内容运营</option><option>中台建设</option><option>资源管理</option><option>产品协同</option><option>个人成长</option><option>其他任务</option></select></label>
+        </div>
+        <div class="form-row">
+          <label>优先级<select name="priority"><option>P0</option><option>P1</option><option>P2</option></select></label>
+          <label>状态<select name="status"><option>待开始</option><option>进行中</option><option>待确认</option><option>已完成</option></select></label>
+        </div>
+        <div class="form-row">
+          <label>负责人<input name="assignee" type="text"></label>
+          <label>配合人<input name="collaborator" type="text"></label>
+        </div>
+        <label>截止日期<input name="dueDate" type="date"></label>
+        <label>任务步骤 <button class="small-btn secondary" id="addStepBtn" type="button" style="margin-left:8px">+ 添加步骤</button></label>
+        <div class="steps-editor" id="stepsEditor"></div>
+        <label>下一步动作<input name="nextAction" type="text"></label>
+        <label>验收证据<input name="evidence" type="text"></label>
+        <div style="display:flex;gap:8px">
+          <button class="primary" type="button" id="taskEditSaveBtn">保存</button>
+          <button class="small-btn secondary" type="button" id="taskArchiveBtn" style="display:none">归档</button>
+          <button class="small-btn secondary" type="button" id="taskDeleteBtn" style="display:none;color:var(--red);border-color:rgba(184,93,79,0.3)">删除</button>
+        </div>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="experienceModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="experienceModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">经验复盘</span>
+          <h2 id="experienceModalTitle">新增经验</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-experience type="button" aria-label="关闭新增经验">×</button>
+      </div>
+      <form class="taxonomy-form" id="experienceForm">
+        <label>
+          标题
+          <input name="title" type="text" autocomplete="off" placeholder="例如：标题前15字决定用户是否点开">
+        </label>
+        <label>
+          经验内容
+          <textarea name="body" rows="4" placeholder="描述具体发生了什么、你的判断和可复用结论。至少10个字。"></textarea>
+        </label>
+        <div class="form-row">
+          <label>
+            类型
+            <select name="type">
+              <option>加分行为</option>
+              <option>减分行为</option>
+              <option>中性观察</option>
+            </select>
+          </label>
+          <label>
+            经验分类
+            <select name="category">
+              <option>内容大原则</option>
+              <option>简单/品牌</option>
+              <option>AI/工作流</option>
+              <option>访谈方法</option>
+              <option>脚本撰写</option>
+              <option>选题</option>
+              <option>标题</option>
+              <option>结构</option>
+              <option>待分类</option>
+            </select>
+          </label>
+        </div>
+        <div class="form-row">
+          <label>
+            话题簇
+            <select name="topic">
+              <option>全簇通用</option>
+              <option>职场</option>
+              <option>友谊</option>
+              <option>亲密关系</option>
+              <option>职业转型</option>
+              <option>大师名家</option>
+            </select>
+          </label>
+          <label>
+            经验级别
+            <select name="level">
+              <option>普通经验</option>
+              <option>核心原则</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          关联 CASE
+          <input name="caseId" type="text" autocomplete="off" placeholder="例如：内容复盘 CR-0015">
+        </label>
+        <input type="hidden" name="library" value="library">
+        <button class="primary" type="submit">保存经验</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="competitorModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="competitorModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">对标账号</span>
+          <h2 id="competitorModalTitle">添加对标账号</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-competitor type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="competitorForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>账号名称<input name="name" placeholder="例如：行业账号A"></label>
+        <label>平台<select name="platform"><option>小红书</option><option>抖音</option><option>视频号</option><option>公众号</option><option>B站</option></select></label>
+        <label>预估粉丝<input name="followers" placeholder="例如：5.2万"></label>
+        <label>内容方向<input name="contentDirection" placeholder="例如：行业知识与案例"></label>
+        <label>更新频率<input name="postFrequency" placeholder="例如：每周3-4条"></label>
+        <label>链接<input name="url" placeholder="https://..."></label>
+        <label style="grid-column:1/-1">可学习点（每行一个）<textarea name="strengths" rows="2" placeholder="标题情绪感强&#10;封面统一有辨识度&#10;评论区互动活跃"></textarea></label>
+        <label style="grid-column:1/-1">不足之处（每行一个）<textarea name="weaknesses" rows="2" placeholder="缺少B端内容&#10;没有培训内容"></textarea></label>
+        <label style="grid-column:1/-1">我们的差异机会<input name="ourOpportunity" placeholder="对方未覆盖，我们可以切入的方向"></label>
+        <label style="grid-column:1/-1">备注<input name="notes" placeholder="其他观察"></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="taxonomyModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="taxonomyModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label" id="taxonomyModalKicker">页面管理</span>
+          <h2 id="taxonomyModalTitle">管理分类</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-taxonomy type="button" aria-label="关闭分类管理">×</button>
+      </div>
+      <div class="settings-group-tabs" id="settingsGroupTabs"></div>
+      <form class="taxonomy-form" id="taxonomyForm">
+        <input type="hidden" name="view" id="taxonomyView">
+        <input type="hidden" name="group" id="taxonomyGroup">
+        <label>
+          名称
+          <input name="name" id="taxonomyName" type="text" autocomplete="off" placeholder="例如：职场">
+        </label>
+        <label id="taxonomyWordsWrap">
+          匹配词
+          <input name="words" id="taxonomyWords" type="text" autocomplete="off" placeholder="用逗号分隔，例如：求职,失业,加班">
+        </label>
+        <button class="primary" type="submit" aria-label="新增分类项">新增</button>
+      </form>
+      <div class="taxonomy-list" id="taxonomyList"></div>
+    </section>
+  </div>
+  <div class="modal-layer" id="feishuDocModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="feishuDocModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">飞书文档</span>
+          <h2 id="feishuDocModalTitle">新增文档</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-feishu-doc type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="feishuDocForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>文档标题 *<input name="title" placeholder="例如：项目说明 v1" required></label>
+        <label>文档类型<select name="docType"><option value="">请选择</option><option>BP/商业计划书</option><option>一页纸</option><option>路演稿</option><option>尽调回复</option><option>财务模型</option><option>投资协议</option><option>融资计划</option><option>其他</option></select></label>
+        <label>版本号<input name="version" placeholder="v1.0"></label>
+        <label>状态<select name="docStatus"><option>草稿</option><option>内部审阅</option><option>已发送</option><option>已过时</option></select></label>
+        <label>关联资方<input name="relatedInvestor" placeholder="输入资方名称"></label>
+        <label style="grid-column:1/-1">飞书链接 *<input name="url" placeholder="https://...feishu.cn/..." required></label>
+        <label style="grid-column:1/-1">备注<textarea name="notes" rows="2" placeholder="文档说明、关键内容等"></textarea></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="referralModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="referralModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">人脉推荐</span>
+          <h2 id="referralModalTitle">新增人脉</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-referral type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="referralForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>姓名 *<input name="name" placeholder="联系人姓名" required></label>
+        <label>原单位<input name="organization" placeholder="例如：投资推广和企业服务中心"></label>
+        <label>职位<input name="position" placeholder="例如：招商部部长"></label>
+        <label>联系方式<input name="contact" placeholder="微信/手机"></label>
+        <label style="grid-column:1/-1">推荐的资方<input name="investorsReferred" placeholder="多个资方用逗号分隔，例如：万兴科技, 某某资本"></label>
+        <label>最后联系<input name="lastContact" type="date"></label>
+        <label style="grid-column:1/-1">备注<textarea name="notes" rows="2" placeholder="补充信息、推荐背景等"></textarea></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="meetingNoteModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="meetingNoteModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">会议纪要</span>
+          <h2 id="meetingNoteModalTitle">新增会议纪要</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-meeting-note type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="meetingNoteForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>会议日期 *<input name="date" type="date" required></label>
+        <label>关联资方<input name="relatedInvestor" placeholder="选择或输入资方名称"></label>
+        <label>会议类型<select name="meetingType"><option>项目会议</option><option>初次沟通</option><option>需求访谈</option><option>方案讨论</option><option>复盘会议</option><option>其他</option></select></label>
+        <label>飞书纪要链接<input name="feishuUrl" placeholder="https://...feishu.cn/..."></label>
+        <label style="grid-column:1/-1">投资人提问/关注点<textarea name="questions" rows="3" placeholder="投资人问了什么？关注什么问题？"></textarea></label>
+        <label style="grid-column:1/-1">我方回答/回应<textarea name="answers" rows="3" placeholder="我们怎么回答的？"></textarea></label>
+        <label style="grid-column:1/-1">反对意见/疑虑<textarea name="objections" rows="2" placeholder="投资人表达了哪些担忧？"></textarea></label>
+        <label style="grid-column:1/-1">后续动作<textarea name="followUp" rows="2" placeholder="需要跟进什么？谁负责？截止时间？"></textarea></label>
+        <label style="grid-column:1/-1">备注<textarea name="notes" rows="2" placeholder="其他纪要"></textarea></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="metricModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="metricModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">业务数据</span>
+          <h2 id="metricModalTitle">新增数据</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-metric type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="metricForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>指标名称 *<input name="name" placeholder="例如：月度活跃用户" required></label>
+        <label>分类<select name="category"><option>收入</option><option>用户</option><option>运营</option><option>融资</option><option>其他</option></select></label>
+        <label>数值<input name="value" placeholder="例如：10.5"></label>
+        <label>单位<input name="unit" placeholder="万元/人/%/场"></label>
+        <label>统计周期<input name="period" placeholder="例如：2026年7月"></label>
+        <label>数据日期 *<input name="date" type="date" required></label>
+        <label style="grid-column:1/-1">备注<textarea name="notes" rows="2" placeholder="数据来源、计算方式等"></textarea></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="investorModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="investorModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">资方管理</span>
+          <h2 id="investorModalTitle">新增资方</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-investor type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="investorForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>机构名称 *<input name="name" placeholder="例如：红杉资本" required></label>
+        <label>分类<select name="type"><option value="">请选择</option><option>投资方</option><option>合作方</option></select></label>
+        <label>阶段<select name="stage"><option>初次接触</option><option>已接触</option><option>路演已安排</option><option>路演完成</option><option>尽调中</option><option>条款谈判</option><option>已投资</option><option>放弃</option></select></label>
+        <label>意向<select name="intent"><option>待评估</option><option>强</option><option>中</option><option>弱</option><option>暂无意向</option></select></label>
+        <label>轮次<input name="round" placeholder="例如：天使轮/Pre-A/A轮"></label>
+        <label>金额<input name="amount" placeholder="例如：500万"></label>
+        <label>对接人<input name="liaison" placeholder="我方谁在跟"></label>
+        <label>联系方式<input name="contact" placeholder="对方姓名/职位/微信"></label>
+        <label>关注方向<input name="focus" placeholder="例如：AI/消费/文旅"></label>
+        <label>路演安排<select name="roadshowScheduled"><option>未安排</option><option>已安排</option><option>已完成</option></select></label>
+        <label>路演时间<input name="roadshowDate" type="date"></label>
+        <label>复盘状态<select name="hasReview"><option>待整理</option><option>已整理</option></select></label>
+        <label style="grid-column:1/-1">飞书复盘链接<input name="reviewUrl" placeholder="https://...feishu.cn/..."></label>
+        <label>最后联系<input name="lastContact" type="date"></label>
+        <label>下一步动作<input name="nextStep" placeholder="下一步要做什么"></label>
+        <label>基金规模<input name="fundSize" placeholder="例如：5亿人民币"></label>
+        <label>投资阶段偏好<input name="investStage" placeholder="天使/Pre-A/A/B"></label>
+        <label style="grid-column:1/-1">历史投资案例<textarea name="historyCases" rows="2" placeholder="已投项目列表"></textarea></label>
+        <label>LP背景<input name="lpBackground" placeholder="例如：政府引导基金、家族办公室"></label>
+        <label>决策流程<input name="decisionProcess" placeholder="例如：IC周会→合伙人终审"></label>
+        <label>预计close<input name="expectedClose" type="date"></label>
+        <label style="grid-column:1/-1">备注<textarea name="notes" rows="2" placeholder="补充信息、关键点等"></textarea></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <div class="modal-layer" id="scheduleModal" hidden>
+    <section class="taxonomy-modal page-settings-modal" role="dialog" aria-modal="true" aria-labelledby="scheduleModalTitle">
+      <div class="modal-head">
+        <div>
+          <span class="label">日程管理</span>
+          <h2 id="scheduleModalTitle">新增日程</h2>
+        </div>
+        <button class="icon-btn close-btn" data-close-schedule type="button" aria-label="关闭">×</button>
+      </div>
+      <form class="taxonomy-form" id="scheduleForm" style="grid-template-columns:1fr 1fr;gap:10px;">
+        <input type="hidden" name="id">
+        <label>标题 *<input name="title" placeholder="例如：项目周会" required></label>
+        <label>日期 *<input name="date" type="date" required></label>
+        <label>时间<input name="time" placeholder="例如：14:00-16:00"></label>
+        <label>平台/工具<input name="platform" placeholder="例如：腾讯会议"></label>
+        <label>地点/形式<select name="location"><option>线上</option><option>线下</option><option>线上+线下</option></select></label>
+        <label>会议号/地址<input name="meetingNumber" placeholder="例如：360-527-816"></label>
+        <label style="grid-column:1/-1">备注<textarea name="notes" rows="2" placeholder="其他备注"></textarea></label>
+        <button class="primary" type="submit" style="grid-column:1/-1">保存</button>
+      </form>
+    </section>
+  </div>
+  <script src="./app.js"></script>
+  <button class="back-to-top" id="backToTop" type="button" aria-label="回到顶部" title="回到顶部">↑</button>
+</body>
+</html>

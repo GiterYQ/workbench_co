@@ -1,0 +1,47 @@
+{
+  "meta": {
+    "workspaceName": "内容运营工作台",
+    "owner": "",
+    "updatedAt": "",
+    "mode": "local-first",
+    "principle": "事实数据进入主系统，个人理解进入知识库，重复工作沉淀为可复用流程，工作台负责聚合和执行。"
+  },
+  "boundaries": [],
+  "dailyGrowth": {
+    "date": "",
+    "account": "",
+    "totalFollowers": 0,
+    "dailyIncrease": 0,
+    "weeklyIncrease": 0,
+    "monthlyIncrease": 0,
+    "goalFollowers": 0,
+    "goalDate": "",
+    "platforms": [],
+    "insights": []
+  },
+  "hotContentLab": {
+    "source": "",
+    "categories": [],
+    "filters": [],
+    "taxonomy": {
+      "categories": [],
+      "topics": [],
+      "audiences": []
+    },
+    "ideas": []
+  },
+  "sourceCards": [],
+  "workflowQueue": [],
+  "systemStatus": [],
+  "customerFollowUp": {
+    "segments": [],
+    "fields": []
+  },
+  "skills": [],
+  "tasks": [],
+  "sync": {
+    "feishuBaseUrl": "",
+    "obsidianPath": "",
+    "scripts": []
+  }
+}
